@@ -10,7 +10,6 @@ API REST desarrollada con **Python + Flask + SQL**.
 - Flask-JWT-Extended (autenticación)
 - Flask-Bcrypt (hash de contraseñas)
 - Flask-CORS
-- PostgreSQL + psycopg2
 - Pillow (validación y optimización de imágenes)
 
 ## Setup inicial

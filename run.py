@@ -1,7 +1,7 @@
 import os
 from app.main import create_app, db
 
-app = create_app(os.getenv("MENU_FLASK_ENV", "development"))
+app = create_app(os.getenv("CHECADOR_FLASK_ENV", "development"))
 
 def listar_apis():
     print("\n" + "="*80)
@@ -16,7 +16,6 @@ def listar_apis():
     print("="*80 + "\n")
 
 ###### Punto de entrada ###########
-
 if __name__ == "__main__":
     print("# AQUI ENTRA")
     listar_apis()
