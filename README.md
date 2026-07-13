@@ -1,26 +1,54 @@
-## Crear Entorno Virtual (venv)
+# Menú Digital — Backend API
 
-    python3 -m venv venv
+API REST desarrollada con **Python + Flask + SQL**.
 
-## Ejecutar Entorno Virtual
+## Stack
 
-    --Linux:    source venv/bin/activate
-    --Win:      ./venv/Scripts/activate
-    --Salir del venv:     deactivate
+- Python 3.11+
+- Flask 3.x
+- Flask-SQLAlchemy + Flask-Migrate
+- Flask-JWT-Extended (autenticación)
+- Flask-Bcrypt (hash de contraseñas)
+- Flask-CORS
+- PostgreSQL + psycopg2
+- Pillow (validación y optimización de imágenes)
 
-## Actualizar Pip
+## Setup inicial
 
-    python -m pip install --upgrade pip
+### 1. Clonar y crear entorno virtual
 
-## Instalacion de Dependencias
+```bash
+python -m venv venv
 
-    pip3 install -r requirements.txt
+```
 
-## Run
+### 1.1.- Ejecutar comando segun el caso
 
-    flask --app main run
-    python main.py
+```bash
+source venv/bin/activate # Mac/Linux
 
-## Ejecucion GUNICORN
+venv\Scripts\activate  # Windows
+```
 
-    gunicorn -w 4 -b 0.0.0.0:5100 main:app --log-level debug
+### 2. Instalar dependencias
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Configurar variables de entorno
+
+```bash
+cp .env.template .env
+# Editar .env con tus credenciales de PostgreSQL
+```
+
+### 4. Levantar el servidors
+
+```bash
+flask run
+# o
+python run.py
+```
+
+La API estará disponible en: `http://localhost:5000`
