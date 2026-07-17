@@ -7,7 +7,7 @@ from app.utils.Env import EnvSingleton
 
 env = EnvSingleton().env_singleton
 
-APP_NAME    = "Checador_App"
+APP_NAME    = "ChecadorApp"
 LOG_ROUTE   = env.route_log
 
 

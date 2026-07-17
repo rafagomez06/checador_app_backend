@@ -3,7 +3,7 @@ from app.main import create_app, db
 
 app = create_app(os.getenv("CHECADOR_FLASK_ENV", "development"))
 
-def listar_apis():
+def listar_endpoints():
     print("\n" + "="*80)
     print("ENDPOINTS DISPONIBLES")
     print("="*80)
@@ -17,6 +17,5 @@ def listar_apis():
 
 ###### Punto de entrada ###########
 if __name__ == "__main__":
-    print("# AQUI ENTRA")
-    listar_apis()
+    listar_endpoints()
     app.run(host="0.0.0.0", port=5000, debug=True)

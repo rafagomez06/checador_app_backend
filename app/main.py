@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -26,6 +27,7 @@ def create_app(env: str = "default") -> Flask:
     from app.config import config
 
     app = Flask(__name__)
+
     app.config.from_object(config[env])
     app.json.sort_keys = False
     # Inicializar extensiones 
@@ -33,24 +35,34 @@ def create_app(env: str = "default") -> Flask:
     migrate.init_app(app, db)
     jwt.init_app(app)
     bcrypt.init_app(app)
-    CORS(app, origins=["http://localhost:3000"])   # React en desarrollo
+    CORS(app, origins=["http://localhost:3000"])   # Consumo de Front en desarrollo
     URL_PREFIX = '/api/v1'
 
     # Registrar Rutas de entrada 
-    # from app.controllers.AuthController import AuthController
-    # from app.controllers.MenuController import MenuController
-    from app.controllers.CatalogoController import CatalogoController
+    from app.controllers.UsuariosController import UsuariosController
+    from app.controllers.ChecadorController import ChecadorController
 
     # Rutas Endpoints
-    # app.register_blueprint(AuthController, url_prefix=f"{URL_PREFIX}/test")
-    # app.register_blueprint(AuthController, url_prefix=f"{URL_PREFIX}/auth")
-    # app.register_blueprint(MenuController,  url_prefix=f"{URL_PREFIX}/menu")
-    app.register_blueprint(CatalogoController, url_prefix=f"{URL_PREFIX}/catalogos")
+    app.register_blueprint(UsuariosController, url_prefix=f"{URL_PREFIX}/auth")
+    app.register_blueprint(ChecadorController, url_prefix=f"{URL_PREFIX}/checador")
+
 
     # Manejadores de errores globales 
     _register_error_handlers(app)
 
+    # HEALT CHECK ENDPOINT
+    @app.route('/api/v1/health', methods=['GET'])
+    def health_check():
+        return jsonify({
+            "status": "healthy",
+            "service": "Checador API",
+            "version": "1.0.0",
+            "mensaje": "Funcionando OK",
+            "timestamp": datetime.now().isoformat()
+        }), 200
+    
     return app
+
 
 
 def _register_error_handlers(app: Flask):

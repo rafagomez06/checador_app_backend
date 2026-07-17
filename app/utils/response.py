@@ -12,6 +12,7 @@ def api_response(status_code, data=None, status_message=None, message=None):
             "status_code":    status_code,
             "status_message": status_message,
             "message":        message,
+            "timestamp":  datetime.now().isoformat(),
             "data":           data,
         }
         return jsonify({"body": body}), status_code
