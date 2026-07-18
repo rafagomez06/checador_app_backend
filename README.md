@@ -1,4 +1,4 @@
-# Menú Digital — Backend API
+# Checador APP — Backend API
 
 API REST desarrollada con **Python + Flask + SQL**.
 
