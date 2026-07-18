@@ -16,7 +16,7 @@ class ChecadorService:
     @staticmethod
     def registrar_checada(data):
         try:
-            LOG.info(f"Solicitud entrada: {data}")
+            LOG.info(f"## Solicitud entrada: {data}\n")
             
             # Obtenemos valores de peticion
             usuario_id = data["usuario_id"]

@@ -21,8 +21,7 @@ class ChecadorModel(sql_connection.Model):
     @staticmethod
     def registrar_checada(usuario_id,latitud,longitud):
         sql = text(f"EXEC sp_RegistrarChecada @UsuarioSistema='{usuario_id}',@Latitud={latitud},@Longitud={longitud};")
-        print(f"Consulta ######: {sql}")
-        LOG.info(f"Consulta: {sql}")
+        LOG.info(f"## Consulta: {sql}")
         result = sql_connection.session.execute(sql)
         
         return result
