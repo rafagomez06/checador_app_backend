@@ -20,15 +20,17 @@ class ChecadorService:
             
             # Obtenemos valores de peticion
             usuario_id = data["usuario_id"]
+            tipo_checada = data["tipo_checada"]
             ubicacion = data.get("ubicacion", {})
 
             latitud = ubicacion.get("latitud")
             longitud = ubicacion.get("longitud")
-            precision = ubicacion.get("precision")
-            direccion = ubicacion.get("direccion")
+            direccion = ubicacion.get("direccionCompleta", {})
+            #Extraemos valores de direccionCompleta
+            direccionCompleta = direccion.get("direccionCompleta", "")
 
-            
-            checada_result = ChecadorModel.registrar_checada(usuario_id,latitud,longitud)
+            #Envio de datos a SP
+            checada_result = ChecadorModel.registrar_checada(usuario_id,tipo_checada,latitud,longitud,direccionCompleta)
 
             # Convertimos valores obtenidos
             columns = checada_result.keys()
@@ -44,13 +46,14 @@ class ChecadorService:
             mensajeSQL = primer_elemento_sql.get('mensaje')
 
             # si SP falla se retorna su respuesta
-            if estadoSQL != 200:
+            if estadoSQL != STATUS_CODE_200:
                 LOG.info(f"Error: {mensajeSQL} ")
-                return api_response(STATUS_CODE_409, {},mensajeSQL)
+                # ConnectionDb.alchemy_db.session.rollback()
+                return api_response(STATUS_CODE_409,{},ERROR,mensajeSQL)
             
             #Commit y Retorno de datos
             ConnectionDb.alchemy_db.session.commit()
-            return api_response(STATUS_CODE_200,json_data,SUCCESS)
+            return api_response(STATUS_CODE_200,json_data,SUCCESS,mensajeSQL)
 
         except exc.StatementError as sta_err:
             error_trace = traceback.format_exc()

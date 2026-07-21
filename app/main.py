@@ -35,7 +35,8 @@ def create_app(env: str = "default") -> Flask:
     migrate.init_app(app, db)
     jwt.init_app(app)
     bcrypt.init_app(app)
-    CORS(app, origins=["http://localhost:3000"])   # Consumo de Front en desarrollo
+    # CORS(app, origins=["http://localhost:3000"])   # Consumo de Front en desarrollo
+    CORS(app, origins="*")  # Permitir todos
     URL_PREFIX = '/api/v1'
 
     # Registrar Rutas de entrada 
