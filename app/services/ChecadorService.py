@@ -26,6 +26,7 @@ class ChecadorService:
             latitud = ubicacion.get("latitud")
             longitud = ubicacion.get("longitud")
             direccion = ubicacion.get("direccionCompleta", {})
+
             #Extraemos valores de direccionCompleta
             direccionCompleta = direccion.get("direccionCompleta", "")
 
@@ -75,7 +76,7 @@ class ChecadorService:
     def obtener_historial_checadas(data):
         try:
 
-            LOG.info(f"## rango entrada: {data}\n")
+            LOG.info(f"## rango entrada: {data}")
             
             # Obtenemos valores de peticion
             usuario_id = data["usuario_id"]

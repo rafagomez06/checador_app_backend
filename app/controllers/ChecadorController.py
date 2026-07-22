@@ -12,15 +12,17 @@ ChecadorController  = Blueprint("checador", __name__)
 # Rutas privadas (JWT)
 # #####################################
 
-# @ChecadorController.route("/usuarios", methods=["GET"])
-# # @jwt_required()
-# def listar_usuarios():
-#     return UsuariosService.listar_usuarios()
-
-
+# Checada Normal con conexión
 @ChecadorController.route("/registrar-checada", methods=["POST"])
 # @jwt_required()
 def registrar_checada():
+    data = request.get_json()
+    return ChecadorService.registrar_checada(data)
+
+#Checada OFFLINE
+@ChecadorController.route("/registrar-checada-offline", methods=["POST"])
+# @jwt_required()
+def registrar_checada_offline():
     data = request.get_json()
     return ChecadorService.registrar_checada(data)
 
