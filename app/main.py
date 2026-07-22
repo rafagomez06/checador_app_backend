@@ -6,6 +6,8 @@ from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
+from app.utils.response import api_response
+from app.utils.Messages import *
 
 # Extensiones se instancian sin app (patron Application Factory)
 db      = SQLAlchemy()
@@ -78,37 +80,37 @@ def _register_error_handlers(app: Flask):
     @app.errorhandler(DatabaseError)
     def handle_database_error(error):
         LOG.error(f"DatabaseError: {error}")
-        return jsonify({"status": 500, "body": {"error": str(error)}}), 500
+        return api_response(STATUS_CODE_500,[],ERROR,str(error))
 
     @app.errorhandler(MissingValueError)
     def handle_missing_value(error):
         LOG.warning(f"MissingValueError: {error}")
-        return jsonify({"status": 400, "body": {"error": str(error)}}), 400
+        return api_response(STATUS_CODE_400,[],ERROR,str(error))
 
     @app.errorhandler(NotFoundError)
     def handle_not_found(error):
         LOG.warning(f"NotFoundError: {error}")
-        return jsonify({"status": 404, "body": {"error": str(error)}}), 404
+        return api_response(STATUS_CODE_404,[],ERROR,str(error))
 
     @app.errorhandler(UnauthorizedError)
     def handle_unauthorized(error):
         LOG.warning(f"UnauthorizedError: {error}")
-        return jsonify({"status": 401, "body": {"error": str(error)}}), 401
+        return api_response(STATUS_CODE_401,[],ERROR,str(error))
 
     @app.errorhandler(FileUploadError)
     def handle_file_upload(error):
         LOG.error(f"FileUploadError: {error}")
-        return jsonify({"status": 400, "body": {"error": str(error)}}), 400
+        return api_response(STATUS_CODE_400,[],ERROR,str(error))
 
     @app.errorhandler(UnexpectedError)
     def handle_unexpected(error):
         LOG.error(f"UnexpectedError: {error}")
-        return jsonify({"status": 500, "body": {"error": "Ocurrió un error inesperado"}}), 500
+        return api_response(STATUS_CODE_500,[],ERROR,"Ocurrió un error inesperado")
 
     @app.errorhandler(404)
     def not_found(error):
-        return jsonify({"status": 404, "body": {"error": "Ruta no encontrada"}}), 404
+        return api_response(STATUS_CODE_404,[],ERROR,"Ruta no encontrada")
 
     @app.errorhandler(405)
     def method_not_allowed(error):
-        return jsonify({"status": 405, "body": {"error": "Método no permitido"}}), 405
+        return api_response(STATUS_CODE_405,[],ERROR,"Método no permitido")

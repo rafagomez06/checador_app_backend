@@ -24,4 +24,8 @@ def registrar_checada():
     data = request.get_json()
     return ChecadorService.registrar_checada(data)
 
-
+@ChecadorController.route("/historial-checadas", methods=["GET"])
+# @jwt_required()
+def obtener_historial_checadas():
+    data = request.get_json()
+    return ChecadorService.obtener_historial_checadas(data)

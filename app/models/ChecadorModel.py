@@ -25,6 +25,14 @@ class ChecadorModel(sql_connection.Model):
         result = sql_connection.session.execute(sql)
         
         return result
+    
+    @staticmethod
+    def obtener_historial_checadas(usuario_id,rango_fecha_inicio,rango_fecha_fin):
+        sql = text(f"EXEC sp_HistorialChecadas @UsuarioSistema='{usuario_id}',@RangoFechaInicio='{rango_fecha_inicio}',@RangoFechaFin='{rango_fecha_fin}';")
+        LOG.info(f"## Consulta: {sql}")
+        result = sql_connection.session.execute(sql)
+        
+        return result
 
 
     def roll_back(self):

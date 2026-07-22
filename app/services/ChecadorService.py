@@ -62,7 +62,7 @@ class ChecadorService:
             raise DatabaseError("Error al realizar la sentencia SQL")
         except exc.SQLAlchemyError as e: 
             LOG.error(f"DB error en registrar_checada: {str(e)}")
-            raise DatabaseError("Error al consultar la base de datos")
+            raise DatabaseError("Error al consultar la base de datos - registrar_checada")
         except ValueError as e: 
             LOG.warning(f"Parámetro inválido: {str(e)}")
             raise UnexpectedError("Parámetros de búsqueda inválidos")
@@ -70,3 +70,51 @@ class ChecadorService:
             error_trace = traceback.format_exc()
             LOG.error(f"Error inesperado: {str(e)} | Trace: {error_trace}")
             raise UnexpectedError("Ocurrió un error inesperado")        
+        
+    @staticmethod
+    def obtener_historial_checadas(data):
+        try:
+
+            LOG.info(f"## rango entrada: {data}\n")
+            
+            # Obtenemos valores de peticion
+            usuario_id = data["usuario_id"]
+            rango_fecha_inicio = data["rango_fecha_inicio"]
+            rango_fecha_fin = data["rango_fecha_fin"]
+
+            listado_result = ChecadorModel.obtener_historial_checadas(usuario_id,rango_fecha_inicio,rango_fecha_fin)
+
+            # Convertimos valores obtenidos
+            columns = listado_result.keys()
+            rows = listado_result.fetchall()
+
+            # Validamos resultado
+            if columns is None or len(rows) == 0:
+                LOG.info(f"GET /historial-checadas")
+                return api_response(STATUS_CODE_404, [],ERROR,ERROR_EMPTY)
+
+            df_result = pd.DataFrame(rows, columns=columns)
+
+            # Limpiar t_body antes de asignar nuevos valores
+            t_body = []
+
+            # Convertimos las filas de datos en una lista de diccionarios
+            t_body = df_result.to_dict(orient="records")
+            
+            return api_response(STATUS_CODE_200,t_body,SUCCESS)
+
+        except exc.StatementError as sta_err:
+            error_trace = traceback.format_exc()
+            LOG.error(
+                f"Err al realizar la sentencia en obtener_historial_checadas:{str(sta_err)} [{error_trace}]")
+            raise DatabaseError("Err al realizar la sentencia SQL")
+        except exc.SQLAlchemyError as e: 
+            LOG.error(f"DB error en obtener_historial_checadas: {str(e)}")
+            raise DatabaseError("Error al consultar la base de datos - obtener_historial_checadas")
+        except ValueError as e: 
+            LOG.warning(f"Parámetro inválido: {str(e)}")
+            raise UnexpectedError("Parámetros de búsqueda inválidos - obtener_historial_checadas")
+        except Exception as e:  
+            error_trace = traceback.format_exc()
+            LOG.error(f"Error inesperado: {str(e)} | Trace: {error_trace}")
+            raise UnexpectedError("Ocurrió un error inesperado - obtener_historial_checadas")
