@@ -21,8 +21,15 @@ class ChecadorService:
             # Obtenemos valores de peticion
             usuario_id = data["usuario_id"]
             tipo_checada = data["tipo_checada"]
-            ubicacion = data.get("ubicacion", {})
+            fecha_hora_captura=data["fecha_hora_captura"]
+            id_local=data["id_local"]
 
+            print(fecha_hora_captura)
+            print(id_local)
+
+
+            # valores ubicacion
+            ubicacion = data.get("ubicacion", {})
             latitud = ubicacion.get("latitud")
             longitud = ubicacion.get("longitud")
             direccion = ubicacion.get("direccionCompleta", {})
@@ -31,7 +38,8 @@ class ChecadorService:
             direccionCompleta = direccion.get("direccionCompleta", "")
 
             #Envio de datos a SP
-            checada_result = ChecadorModel.registrar_checada(usuario_id,tipo_checada,latitud,longitud,direccionCompleta)
+            checada_result = ChecadorModel.registrar_checada(usuario_id,tipo_checada,latitud,longitud,
+                                                            direccionCompleta,fecha_hora_captura,id_local)
 
             # Convertimos valores obtenidos
             columns = checada_result.keys()

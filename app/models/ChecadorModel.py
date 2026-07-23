@@ -19,8 +19,9 @@ class ChecadorModel(sql_connection.Model):
         self.nombre = nombre
 
     @staticmethod
-    def registrar_checada(usuario_id,tipo_checada,latitud,longitud,direccionCompleta):
-        sql = text(f"EXEC sp_RegistrarChecada @UsuarioSistema='{usuario_id}',@IdTipoChecada={tipo_checada},@Latitud='{latitud}',@Longitud='{longitud}',@DireccionCompleta='{direccionCompleta}';")
+    def registrar_checada(usuario_id,tipo_checada,latitud,longitud,direccionCompleta,fecha_hora_captura,id_local):
+        sql = text(f"EXEC sp_RegistrarChecada @UsuarioSistema='{usuario_id}',@IdTipoChecada={tipo_checada},@FechaCapturaDispositivo='{fecha_hora_captura}',"
+                f" @Latitud='{latitud}',@Longitud='{longitud}',@DireccionCompleta='{direccionCompleta}', @IdlocalUUID='{id_local}';")
         LOG.info(f"## Consulta: {sql}")
         result = sql_connection.session.execute(sql)
         
