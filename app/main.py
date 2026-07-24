@@ -6,8 +6,16 @@ from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from flask_limiter.errors import RateLimitExceeded
+
 from app.utils.response import api_response
 from app.utils.Messages import *
+
+def get_limiter_key():
+
+    return get_remote_address()
 
 # Extensiones se instancian sin app (patron Application Factory)
 db      = SQLAlchemy()
@@ -15,6 +23,11 @@ migrate = Migrate()
 jwt     = JWTManager()
 bcrypt  = Bcrypt()
 
+limiter = Limiter(
+    key_func=get_limiter_key,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://" # En producción cambia a Redis: "redis://localhost:6379"
+)
 class ConnectionDb:
     _instance = None
     alchemy_db = db
@@ -37,6 +50,8 @@ def create_app(env: str = "default") -> Flask:
     migrate.init_app(app, db)
     jwt.init_app(app)
     bcrypt.init_app(app)
+    limiter.init_app(app)
+
     # CORS(app, origins=["http://localhost:3000"])   # Consumo de Front en desarrollo
     CORS(app, origins="*")  # Permitir todos
     URL_PREFIX = '/api/v1'
@@ -76,6 +91,17 @@ def _register_error_handlers(app: Flask):
     )
     from app.utils.Logger import logger
     LOG = logger()
+
+
+    @app.errorhandler(RateLimitExceeded)
+    def handle_rate_limit_exceeded(error):
+        LOG.warning(f"RateLimitExceeded: {error.description}")
+        return api_response(
+            STATUS_CODE_429 if 'STATUS_CODE_429' in globals() else 429,
+            [],
+            ERROR,
+            f"Límite de peticiones superado: {error.description}"
+        )
 
     @app.errorhandler(DatabaseError)
     def handle_database_error(error):

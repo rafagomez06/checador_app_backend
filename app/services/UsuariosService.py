@@ -19,33 +19,27 @@ class UsuariosService:
             listado_result = UsuariosModel.obtener_usuarios()
 
             # Convertimos valores obtenidos
-            columns = listado_result.keys()
-            rows = listado_result.fetchall()
+            # Convertimos valores obtenidos
+            columns = checada_result.keys()
+            rows = checada_result.fetchall()
             df_result = pd.DataFrame(rows, columns=columns)
             json_result = df_result.to_json(orient="records")
             
+            json_data = []
             # Procesar el resultado del SP
             json_data = json.loads(json_result)
-            # primer_elemento_sql = json_data[0]
-            # estadoSQL = primer_elemento_sql.get('estatus')
-            # mensajeSQL = primer_elemento_sql.get('mensaje')
+            primer_elemento_sql = json_data[0]
+            estadoSQL = primer_elemento_sql.get('estatus')
+            mensajeSQL = primer_elemento_sql.get('mensaje')
 
-            # # si SP falla se retorna su respuesta
-            # if estadoSQL != 200:
-            #     LOG.info(f"Error: {mensajeSQL} ")
-            #     return api_response(409, {"Error": mensajeSQL})
-
-            # # Limpiar t_body antes de asignar nuevos valores
-            # t_body = []
-
-            # # Convertimos las filas de datos en una lista de diccionarios
-            # t_body = df_result.to_dict(orient="records")
-
-            if not listado_result:
-                LOG.warning(f"GET /usuarios-sistema")
-                return api_response(STATUS_CODE_404, None,ERROR,ERROR_EMPTY)
+            # si SP falla se retorna su respuesta
+            if estadoSQL != STATUS_CODE_200:
+                LOG.info(f"Error: {mensajeSQL} ")
+                # ConnectionDb.alchemy_db.session.rollback()
+                return api_response(STATUS_CODE_409,{},ERROR,mensajeSQL)
             
-            return api_response(STATUS_CODE_200,json_data,SUCCESS)
+            #Commit y Retorno de datos
+            return api_response(STATUS_CODE_200,json_data,SUCCESS,mensajeSQL)
 
         except exc.StatementError as sta_err:
             error_trace = traceback.format_exc()
@@ -86,15 +80,13 @@ class UsuariosService:
             mensajeSQL = primer_elemento_sql.get('mensaje')
 
             # si SP falla se retorna su respuesta
-            if estadoSQL != 200:
+            if estadoSQL != STATUS_CODE_200:
                 LOG.info(f"Error: {mensajeSQL} ")
-                return api_response(STATUS_CODE_401, {},mensajeSQL)
-
-            if not valida_result:
-                LOG.warning(f"POST /validar-login")
-                return api_response(STATUS_CODE_404, None,ERROR,ERROR_EMPTY)
+                # ConnectionDb.alchemy_db.session.rollback()
+                return api_response(STATUS_CODE_409,{},ERROR,mensajeSQL)
             
-            return api_response(STATUS_CODE_200,json_data,SUCCESS)
+            #Commit y Retorno de datos
+            return api_response(STATUS_CODE_200,json_data,SUCCESS,mensajeSQL)
 
         except exc.StatementError as sta_err:
             error_trace = traceback.format_exc()

@@ -16,17 +16,13 @@ class ChecadorService:
     @staticmethod
     def registrar_checada(data):
         try:
-            LOG.info(f"## Solicitud entrada: {data}\n")
+            LOG.info(f"\n\n\n## Solicitud entrada: {data}\n\n\n")
             
             # Obtenemos valores de peticion
             usuario_id = data["usuario_id"]
             tipo_checada = data["tipo_checada"]
             fecha_hora_captura=data["fecha_hora_captura"]
             id_local=data["id_local"]
-
-            print(fecha_hora_captura)
-            print(id_local)
-
 
             # valores ubicacion
             ubicacion = data.get("ubicacion", {})
@@ -68,7 +64,7 @@ class ChecadorService:
             error_trace = traceback.format_exc()
             LOG.error(
                 f"Error al realizar la sentencia en registrar_checada:{str(sta_err)} [{error_trace}]")
-            raise DatabaseError("Error al realizar la sentencia SQL")
+            raise DatabaseError("Error al realizar la sentencia SQL - registrar_checada")
         except exc.SQLAlchemyError as e: 
             LOG.error(f"DB error en registrar_checada: {str(e)}")
             raise DatabaseError("Error al consultar la base de datos - registrar_checada")
@@ -78,14 +74,11 @@ class ChecadorService:
         except Exception as e:  
             error_trace = traceback.format_exc()
             LOG.error(f"Error inesperado: {str(e)} | Trace: {error_trace}")
-            raise UnexpectedError("Ocurrió un error inesperado")        
+            raise UnexpectedError("Ocurrió un error inesperado - registrar_checada")        
         
     @staticmethod
     def obtener_historial_checadas(data):
         try:
-
-            LOG.info(f"## rango entrada: {data}")
-            
             # Obtenemos valores de peticion
             usuario_id = data["usuario_id"]
             rango_fecha_inicio = data["rango_fecha_inicio"]
