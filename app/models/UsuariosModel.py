@@ -26,8 +26,32 @@ class UsuariosModel(sql_connection.Model):
         return result
     
     @staticmethod
-    def validar_login(usuario,password):
-        sql = text(f"EXEC sp_ValidarUsuariosSistema @UsuarioSistema='{usuario}',@PasswordSistema='{password}';")
+    def validar_login(usuario,password_hash):
+        sql = text(f"EXEC sp_ValidarUsuariosChecador @UsuarioChecador='{usuario}',@Password='{password_hash}';")
+        LOG.info(f"Consulta: {sql}")
+        result = sql_connection.session.execute(sql)
+        return result
+    
+    @staticmethod
+    def actualizar_password(usuario,password_hash):
+        sql = text(f"EXEC sp_ActualizarPasswordUsuario @UsuarioChecador='{usuario}',@Password='{password_hash}';")
+        LOG.info(f"Consulta: {sql}")
+        result = sql_connection.session.execute(sql)
+        return result
+    
+    @staticmethod
+    def obtener_usuario_login(usuario):
+        sql = text(f"EXEC sp_ObtenerUsuarioLogin @UsuarioChecador='{usuario}';")
+        LOG.info(f"Consulta: {sql}")
+        result = sql_connection.session.execute(sql)
+        return result
+    
+    @staticmethod
+    def registrar_usuario(id_empleado, id_empresa,usuario_checador,nombre,apellido_paterno,apellido_materno,password_hash):
+        sql = text(f"EXEC sp_RegistrarUsuarioChecadorApp @IdEmpleado={id_empleado},@IdEmpresa={id_empresa},"
+                f"@UsuarioChecador='{usuario_checador}',@NombreUsuario='{nombre}',@ApellidoPaterno='{apellido_paterno}',"
+                f"@ApellidoMaterno='{apellido_materno}',"
+                f"@PasswordHash='{password_hash}';")
         LOG.info(f"Consulta: {sql}")
         result = sql_connection.session.execute(sql)
         return result

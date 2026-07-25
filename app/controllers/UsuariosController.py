@@ -23,4 +23,12 @@ def validar_login():
     data = request.get_json()
     return UsuariosService.validar_login(data)
 
+@UsuariosController.route("/registrar-usuario", methods=["POST"])
+def registrar_usuario():
+    data = request.get_json()
+    return UsuariosService.registrar_usuario(data)
 
+@UsuariosController.route("/actualizar-password", methods=["PUT"])
+def actualizar_password():
+    data = request.get_json()
+    return UsuariosService.actualizar_password(data)

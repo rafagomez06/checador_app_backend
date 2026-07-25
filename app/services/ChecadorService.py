@@ -54,7 +54,7 @@ class ChecadorService:
             if estadoSQL != STATUS_CODE_200:
                 LOG.info(f"Error: {mensajeSQL} ")
                 # ConnectionDb.alchemy_db.session.rollback()
-                return api_response(STATUS_CODE_409,{},ERROR,mensajeSQL)
+                return api_response(STATUS_CODE_400,{},ERROR,mensajeSQL)
             
             #Commit y Retorno de datos
             ConnectionDb.alchemy_db.session.commit()
