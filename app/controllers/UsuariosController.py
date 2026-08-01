@@ -29,6 +29,7 @@ def registrar_usuario():
     return UsuariosService.registrar_usuario(data)
 
 @UsuariosController.route("/actualizar-password", methods=["PUT"])
+@jwt_required()
 def actualizar_password():
     data = request.get_json()
     return UsuariosService.actualizar_password(data)

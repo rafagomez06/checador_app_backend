@@ -2,6 +2,7 @@
 SUCCESS = 'Success'
 ERROR = 'Error'
 MENSAJE = 'Mensaje'
+LOGIN_FAILED = 'login_failed'
 
 UPLOAD_FOLDER = 'static/uploads/'
 
@@ -19,7 +20,7 @@ IMAGEN_ERROR = 'Archivo inválido. Asegúrate de subir una imagen real (JPG, PNG
 ERROR_GET = 'Error al consultar la información.'
 ERROR_EMPTY ='No se encontraron registros.'
 DATA_EMPTY ='No se recibió información.'
-CREDENCIALES_FALLIDAS = 'Credenciales Incorrectas.'
+CREDENCIALES_FALLIDAS = 'Credenciales Incorrectas, intenta de nuevo.'
 
 LOGIN_SUCCESS = 'Login exitoso.'
 

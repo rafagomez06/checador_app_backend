@@ -51,3 +51,7 @@ python run.py
 ```
 
 La API estará disponible en: `http://localhost:5000`
+
+Generacion de token random para encriptado de jwt:
+import secrets
+print(secrets.token_hex(32)) # Genera una cadena segura de 64 caracteres hex

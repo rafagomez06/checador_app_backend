@@ -1,4 +1,5 @@
 from app.models.UsuariosModel import UsuariosModel
+from flask_jwt_extended import create_access_token
 from app.utils.response import api_response
 from app.utils.RaiseException import UnexpectedError
 from app.utils.Logger import logger
@@ -19,7 +20,7 @@ class UsuariosService:
     @staticmethod
     def registrar_usuario(data):
         try:
-            LOG.info("registrar_usuario")
+            LOG.info("## registrar_usuario ##")
             # Obtenemos valores 
             id_empleado = data["id_empleado"]
             id_empresa = data["id_empresa"]
@@ -28,13 +29,14 @@ class UsuariosService:
             apellido_paterno = data["apellido_paterno"].strip()
             apellido_materno = data["apellido_materno"].strip()
             password = data["password"]
+            correo = data["correo"].strip()
 
             password_hash = set_password(password)
             #Envio de datos
             registrar_result = UsuariosModel.registrar_usuario(id_empleado,
                                                             id_empresa,usuario_checador,nombre
                                                             ,apellido_paterno
-                                                            ,apellido_materno,password_hash)
+                                                            ,apellido_materno,password_hash,correo)
 
             # Convertimos valores obtenidos
             columns = registrar_result.keys()
@@ -78,23 +80,32 @@ class UsuariosService:
     @staticmethod
     def validar_login(data):
         try:
-            LOG.info("validar_login")
+            LOG.info("## validar_login ##")
+
             # Obtenemos valores 
             usuario = data["usuario"].strip()
             password = data["password"]
 
-            #Consultamos usuario
-            password_hashSQL = UsuariosService.obtener_usuario_login(usuario)
-            
+            #Consultamos usuario y validamos
+            result_obtener = UsuariosService.obtener_usuario_login(usuario)
+            estatus_result = result_obtener["estatus"]
+            mensaje_result = result_obtener["mensaje"]
+            password_hash_result = result_obtener["password_hash"]
+
+            if estatus_result != STATUS_CODE_200:
+                LOG.info(f"{mensaje_result}: {usuario}")
+                return api_response(STATUS_CODE_401,{},LOGIN_FAILED,mensaje_result)
+
+
             #Valida si pass es correcto
-            es_pass_valido = check_password(password_hashSQL, password)
+            es_pass_valido = check_password(password_hash_result, password)
 
             if not es_pass_valido:
                 LOG.info(f"Contraseña incorrecta para el usuario: {usuario}")
-                return api_response(STATUS_CODE_400,{},ERROR,CREDENCIALES_FALLIDAS)
+                return api_response(STATUS_CODE_401,{},LOGIN_FAILED,CREDENCIALES_FALLIDAS)
             
             #Validamos login
-            valida_result = UsuariosModel.validar_login(usuario,password_hashSQL)
+            valida_result = UsuariosModel.validar_login(usuario,password_hash_result)
 
             # Convertimos valores obtenidos
             columns = valida_result.keys()
@@ -107,15 +118,28 @@ class UsuariosService:
             primer_elemento_sql = json_data[0]
             estadoSQL = primer_elemento_sql.get('estatus')
             mensajeSQL = primer_elemento_sql.get('mensaje')
+            nombre_usuarioSQL = primer_elemento_sql.get('nombre_usuario')
+            correo_usuarioSQL = primer_elemento_sql.get('correo')
+            id_empleadoSQL = primer_elemento_sql.get('id_empleado')
+
 
             # si SP falla se retorna su respuesta
             if estadoSQL != STATUS_CODE_200:
                 LOG.info(f"Error: {mensajeSQL} ")
                 # ConnectionDb.alchemy_db.session.rollback()
-                return api_response(STATUS_CODE_400,{},ERROR,mensajeSQL)
+                return api_response(STATUS_CODE_400,{},LOGIN_FAILED,mensajeSQL)
             
+            # Generamos token unico
+            token = create_access_token(identity=str(usuario))
+
             #Commit y Retorno de datos
-            return api_response(STATUS_CODE_200,json_data,SUCCESS,mensajeSQL)
+            # return api_response(STATUS_CODE_200,json_data,SUCCESS,mensajeSQL)
+            return api_response(STATUS_CODE_200, {
+                    "token": token,
+                    "nombre_usuario":nombre_usuarioSQL,
+                    "correo_usuario":correo_usuarioSQL,
+                    "id_empleado":id_empleadoSQL,
+                    "usuario": usuario},SUCCESS,LOGIN_SUCCESS)
 
         except exc.StatementError as sta_err:
             error_trace = traceback.format_exc()
@@ -137,7 +161,8 @@ class UsuariosService:
     @staticmethod
     def obtener_usuario_login(usuario):
         try:
-            LOG.info("obtener_usuario_login")
+            LOG.info("## obtener_usuario_login ##")
+
             # Obtenemos valores 
             result = UsuariosModel.obtener_usuario_login(usuario)
 
@@ -154,16 +179,12 @@ class UsuariosService:
             mensajeSQL = primer_elemento_sql.get('mensaje')
             password_hashSQL = primer_elemento_sql.get('password_hash')
 
-            # si SP falla se retorna su respuesta
-            if estadoSQL != STATUS_CODE_200:
-                LOG.info(f"Error: {mensajeSQL} ")
-                # ConnectionDb.alchemy_db.session.rollback()
-                return api_response(STATUS_CODE_400,{},ERROR,mensajeSQL)
-            
-            print("password_hash SQL ", password_hashSQL)
-            
-            #Retornamos Passhasheada 
-            return password_hashSQL
+            #Retornamos 
+            return {
+                "estatus": estadoSQL,
+                "mensaje": mensajeSQL,
+                "password_hash": password_hashSQL
+            }
         except exc.StatementError as sta_err:
             error_trace = traceback.format_exc()
             LOG.error(
@@ -184,12 +205,12 @@ class UsuariosService:
     @staticmethod
     def actualizar_password(data):
         try:
-            LOG.info("actualizar_password")
+            LOG.info("## actualizar_password ##")
             # Obtenemos valores 
             usuario = data["usuario"].strip()
-            password = data["password"]
+            nueva_password = data["nueva_password"]
 
-            password_hash = set_password(password)
+            password_hash = set_password(nueva_password)
 
             #Envio de datos
             actualizar_result = UsuariosModel.actualizar_password(usuario,password_hash)

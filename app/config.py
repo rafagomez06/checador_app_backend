@@ -24,22 +24,23 @@ def _build_db_uri() -> str:
 
 class Config:
     """Configuración base compartida por todos los entornos."""
-    SECRET_KEY                    = env.secret_key
-    JWT_SECRET_KEY                = env.jwt_secret_key
+    SECRET_KEY = env.secret_key
+    JWT_SECRET_KEY = env.jwt_secret_key
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    UPLOAD_FOLDER                 = env.upload_folder
-    MAX_CONTENT_LENGTH            = env.max_content_length
+    UPLOAD_FOLDER = env.upload_folder
+    MAX_CONTENT_LENGTH = env.max_content_length
 
-    # JWT — token expira en 8 horas por defecto
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
-    #JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=10)
+    # JWT token expira en 8 horas por defecto
+    #JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=8)
+    #JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=15)
     
 
 
 class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = _build_db_uri()
-    SQLALCHEMY_ECHO = False       # Imprime el SQL generado en consola
+    SQLALCHEMY_ECHO = False # Imprime el SQL generado en consola
 
 
 class ProductionConfig(Config):

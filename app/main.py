@@ -14,20 +14,30 @@ from app.utils.response import api_response
 from app.utils.Messages import *
 
 def get_limiter_key():
-
     return get_remote_address()
 
 # Extensiones se instancian sin app (patron Application Factory)
-db      = SQLAlchemy()
+db = SQLAlchemy()
 migrate = Migrate()
-jwt     = JWTManager()
-bcrypt  = Bcrypt()
+jwt = JWTManager()
+bcrypt = Bcrypt()
 
 limiter = Limiter(
     key_func=get_limiter_key,
     default_limits=["200 per day", "50 per hour"],
     storage_uri="memory://" # En producción cambia a Redis: "redis://localhost:6379"
 )
+# Mensaje Personalizado retorno token expirado
+@jwt.expired_token_loader
+def token_expirado_callback(jwt_header, jwt_payload):
+    return jsonify({
+        "body": {
+            "status_code": STATUS_CODE_401,
+            "status_message": "token_expired",
+            "message": "El token ha expirado. Por favor, vuelve a iniciar sesión.",
+            "data": None
+        }
+    }), 401
 class ConnectionDb:
     _instance = None
     alchemy_db = db
@@ -81,8 +91,6 @@ def create_app(env: str = "default") -> Flask:
     
     return app
 
-
-
 def _register_error_handlers(app: Flask):
     """Registra los manejadores de excepciones personalizadas."""
     from app.utils.RaiseException import (
@@ -121,6 +129,7 @@ def _register_error_handlers(app: Flask):
     @app.errorhandler(UnauthorizedError)
     def handle_unauthorized(error):
         LOG.warning(f"UnauthorizedError: {error}")
+        print(f"UnauthorizedError: {error}")
         return api_response(STATUS_CODE_401,[],ERROR,str(error))
 
     @app.errorhandler(FileUploadError)

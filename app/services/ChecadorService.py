@@ -16,7 +16,7 @@ class ChecadorService:
     @staticmethod
     def registrar_checada(data):
         try:
-            LOG.info(f"\n\n\n## Solicitud entrada: {data}\n\n\n")
+            LOG.info("## registrar_checada ##")
             
             # Obtenemos valores de peticion
             usuario_id = data["usuario_id"]
@@ -79,6 +79,7 @@ class ChecadorService:
     @staticmethod
     def obtener_historial_checadas(data):
         try:
+            LOG.info("## obtener_historial_checadas ##")
             # Obtenemos valores de peticion
             usuario_id = data["usuario_id"]
             rango_fecha_inicio = data["rango_fecha_inicio"]
