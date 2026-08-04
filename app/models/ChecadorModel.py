@@ -34,6 +34,15 @@ class ChecadorModel(sql_connection.Model):
         result = sql_connection.session.execute(sql)
         
         return result
+    
+    @staticmethod
+    def obtener_bitacora_checadas_detalle(usuario_id,rango_fecha_inicio,rango_fecha_fin,id_empresa):
+        sql = text(f"EXEC sp_BitacoraChecadasDetalle @UsuarioSistema='{usuario_id}',@RangoFechaInicio='{rango_fecha_inicio}'"
+                f",@RangoFechaFin='{rango_fecha_fin}', @IdEmpresa='{id_empresa}';")
+        LOG.info(f"## Consulta: {sql}")
+        result = sql_connection.session.execute(sql)
+        
+        return result
 
 
     def roll_back(self):

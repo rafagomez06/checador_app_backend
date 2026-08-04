@@ -26,3 +26,9 @@ def registrar_checada():
 def obtener_historial_checadas():
     data = request.args.to_dict()
     return ChecadorService.obtener_historial_checadas(data)
+
+@ChecadorController.route("/bitacora-checadas-detalle", methods=["GET"])
+@limiter.limit("10 per minute")
+def obtener_bitacora_checadas_detalle():
+    data = request.args.to_dict()
+    return ChecadorService.obtener_bitacora_checadas_detalle(data)

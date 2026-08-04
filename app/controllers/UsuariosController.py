@@ -11,12 +11,6 @@ UsuariosController  = Blueprint("usuarios", __name__)
 # Rutas privadas (JWT)
 # #####################################
 
-# @UsuariosController.route("/usuarios", methods=["GET"])
-# # @jwt_required()
-# def listar_usuarios():
-#     return UsuariosService.listar_usuarios()
-
-
 @UsuariosController.route("/login", methods=["POST"])
 # @jwt_required()
 def validar_login():

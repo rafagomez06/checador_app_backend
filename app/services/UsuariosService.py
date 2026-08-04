@@ -28,15 +28,15 @@ class UsuariosService:
             nombre = data["nombre"].strip()
             apellido_paterno = data["apellido_paterno"].strip()
             apellido_materno = data["apellido_materno"].strip()
-            password = data["password"]
             correo = data["correo"].strip()
+            usuario_creacion = data["usuario_creacion"].strip()
 
-            password_hash = set_password(password)
+            #password_hash = set_password(password)
             #Envio de datos
             registrar_result = UsuariosModel.registrar_usuario(id_empleado,
                                                             id_empresa,usuario_checador,nombre
                                                             ,apellido_paterno
-                                                            ,apellido_materno,password_hash,correo)
+                                                            ,apellido_materno,correo,usuario_creacion)
 
             # Convertimos valores obtenidos
             columns = registrar_result.keys()
@@ -95,7 +95,6 @@ class UsuariosService:
             if estatus_result != STATUS_CODE_200:
                 LOG.info(f"{mensaje_result}: {usuario}")
                 return api_response(STATUS_CODE_401,{},LOGIN_FAILED,mensaje_result)
-
 
             #Valida si pass es correcto
             es_pass_valido = check_password(password_hash_result, password)

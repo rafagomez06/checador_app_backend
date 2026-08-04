@@ -51,11 +51,10 @@ class UsuariosModel(sql_connection.Model):
         return result
     
     @staticmethod
-    def registrar_usuario(id_empleado, id_empresa,usuario_checador,nombre,apellido_paterno,apellido_materno,password_hash,correo):
+    def registrar_usuario(id_empleado, id_empresa,usuario_checador,nombre,apellido_paterno,apellido_materno,correo,usuario_creacion):
         sql = text(f"EXEC sp_RegistrarUsuarioChecadorApp @IdEmpleado={id_empleado},@IdEmpresa={id_empresa},"
                 f"@UsuarioChecador='{usuario_checador}',@NombreUsuario='{nombre}',@ApellidoPaterno='{apellido_paterno}',"
-                f"@ApellidoMaterno='{apellido_materno}',"
-                f"@PasswordHash='{password_hash}', @Correo='{correo}';")
+                f"@ApellidoMaterno='{apellido_materno}',@Correo='{correo}',@UsuarioCreacion='{usuario_creacion}';")
         LOG.info(f"## Consulta: {sql}")
 
         result = sql_connection.session.execute(sql)
