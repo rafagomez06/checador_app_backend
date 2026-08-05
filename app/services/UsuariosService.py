@@ -120,6 +120,10 @@ class UsuariosService:
             nombre_usuarioSQL = primer_elemento_sql.get('nombre_usuario')
             correo_usuarioSQL = primer_elemento_sql.get('correo')
             id_empleadoSQL = primer_elemento_sql.get('id_empleado')
+            dia_semanaSQL = primer_elemento_sql.get('dia_semana')
+            clave_turnoSQL = primer_elemento_sql.get('clave_turno')
+            hora_inicioSQL = primer_elemento_sql.get('hora_inicio')
+            hora_finSQL = primer_elemento_sql.get('hora_fin')
 
 
             # si SP falla se retorna su respuesta
@@ -131,14 +135,26 @@ class UsuariosService:
             # Generamos token unico
             token = create_access_token(identity=str(usuario))
 
-            #Commit y Retorno de datos
-            # return api_response(STATUS_CODE_200,json_data,SUCCESS,mensajeSQL)
-            return api_response(STATUS_CODE_200, {
+            t_body = []
+
+            # Convertimos las filas de datos en una lista de diccionarios
+            t_body = {
                     "token": token,
                     "nombre_usuario":nombre_usuarioSQL,
                     "correo_usuario":correo_usuarioSQL,
                     "id_empleado":id_empleadoSQL,
-                    "usuario": usuario},SUCCESS,LOGIN_SUCCESS)
+                    "usuario": usuario,
+                    "jornada":{
+                            "dia_semana": dia_semanaSQL,
+                            "clave_turno": clave_turnoSQL,
+                            "hora_inicio": hora_inicioSQL,
+                            "hora_fin": hora_finSQL,
+                        }
+                        }
+
+            #Commit y Retorno de datos
+            # return api_response(STATUS_CODE_200,json_data,SUCCESS,mensajeSQL)
+            return api_response(STATUS_CODE_200,t_body ,SUCCESS,LOGIN_SUCCESS)
 
         except exc.StatementError as sta_err:
             error_trace = traceback.format_exc()

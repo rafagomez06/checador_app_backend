@@ -170,14 +170,14 @@ class ChecadorService:
             # Genera PDF
             if (generar_pdf == "1"):
                 titulo = "Reporte de Checadas App"
-                pdf_bytes = PDFService.generar_pdf_checadas(datos_agrupados, titulo,rango_fecha_inicio,rango_fecha_fin)
+                pdf_bytes = PDFService.generar_pdf_checadas(datos_agrupados, titulo,rango_fecha_inicio,rango_fecha_fin,id_empresa)
                 
                 # Crear respuesta con el PDF
                 response = send_file(
                     io.BytesIO(pdf_bytes),
                     mimetype='application/pdf',
                     as_attachment=True,
-                    download_name=f'reporte_checadas_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+                    download_name=f'reporte_checadas_app_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
                 )
                 return response
 
@@ -220,16 +220,19 @@ class ChecadorService:
         
         for registro in datos:
             id_usuario = registro.get("id_usuario")
+            id_empresa = registro.get("id_empresa")
+            nombre_empresa = registro.get("nombre_empresa")
             
             if id_usuario not in usuarios_dict:
                 usuarios_dict[id_usuario] = {
                     "id_usuario": id_usuario,
                     "nombre_completo": str(registro.get("nombre_completo", "")).strip(),
+                    "id_empresa": id_empresa,
+                    "nombre_empresa": nombre_empresa,
                     "detalle_checadas": []
                 }
             
             detalle = {
-                "id_empresa": registro.get("id_empresa"),
                 "id_jornada": registro.get("id_jornada"),
                 "id_tipo_checada": registro.get("id_tipo_checada"),
                 "tipo_checada_descripcion": registro.get("tipo_checada_descripcion"),

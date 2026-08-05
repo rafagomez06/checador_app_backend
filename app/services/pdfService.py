@@ -14,12 +14,11 @@ import pandas as pd
 class PDFService:
     
     @staticmethod
-    def generar_pdf_checadas(datos, titulo="Reporte de Checadas App",rango_fecha_inicio='1900-01-01',rango_fecha_fin='1900-01-01'):
+    def generar_pdf_checadas(datos, titulo="Reporte de Checadas App",rango_fecha_inicio='1900-01-01',
+                            rango_fecha_fin='1900-01-01',id_empresa='0'):
         """
         Genera un PDF con la información de checadas.
         """
-        print("Generando PDF Reporte de Checadas App")
-
         try:
             # Crear buffer para el PDF
             buffer = io.BytesIO()
@@ -89,19 +88,31 @@ class PDFService:
             
             # Fecha de creacion
             fecha_actual = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-            elementos.append(Paragraph(f"Generado: {fecha_actual}", texto_estilo_negritas))
+            elementos.append(Paragraph(f"Reporte Generado: {fecha_actual}", texto_estilo_negritas))
             elementos.append(Paragraph(f"Total de empleados: {len(datos)}", texto_estilo_negritas))
+
+            # Si trae filtro de empresa colocar nombre de empresa elegida.
+            if not id_empresa:
+                nombre_empresa_mostrar = "TODAS"
+            else:
+                nombre_empresa_mostrar = "N/A"
+                if datos and len(datos) > 0:
+                    primer_registro = datos[0]
+                    nombre_empresa_mostrar = primer_registro.get('nombre_empresa')
+            elementos.append(Paragraph(f"Empresa: {nombre_empresa_mostrar}", texto_estilo_negritas))
+
 
             # Si existe rangos de fechas seleccionado, agg subtitulo a reporte
             if rango_fecha_fin or rango_fecha_fin:
                 elementos.append(Paragraph(f"Datos del : {rango_fecha_inicio} al {rango_fecha_fin}", texto_estilo_negritas))
             elementos.append(Spacer(1, 20))
 
+
             # Estilo Para cada usuario
             for usuario in datos:
                 # Nombre del usuario
                 elementos.append(Paragraph(
-                    f"# Empleado: {usuario.get('id_usuario', 'N/A')} - {usuario.get('nombre_completo', 'Sin nombre')} ",
+                    f"N° Empleado: {usuario.get('id_usuario', 'N/A')} - {usuario.get('nombre_completo', 'Sin nombre')} ",
                     subtitulo_estilo
                 ))
                 elementos.append(Spacer(1, 8))
