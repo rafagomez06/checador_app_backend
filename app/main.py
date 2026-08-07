@@ -80,6 +80,7 @@ def create_app(env: str = "default") -> Flask:
 
     # HEALT CHECK ENDPOINT
     @app.route('/api/v1/health', methods=['GET'])
+    @limiter.limit("5 per minute")
     def health_check():
         return jsonify({
             "status": "healthy",
