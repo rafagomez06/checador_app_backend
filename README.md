@@ -1,4 +1,4 @@
-# Checador APP — Backend API
+# Checador APP - Backend API
 
 API REST desarrollada con **Python + Flask + SQL**.
 
@@ -50,8 +50,15 @@ flask run
 python run.py
 ```
 
-La API estará disponible en: `http://localhost:5000`
+### Opcionales:
 
-Generacion de token random para encriptado de jwt:
+- Generar token random para encriptado de jwt:
+
+```bash
 import secrets
 print(secrets.token_hex(32)) # Genera una cadena segura de 64 caracteres hex
+```
+
+### La API estará disponible en:
+
+`http://localhost:5000`

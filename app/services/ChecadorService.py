@@ -34,8 +34,11 @@ class ChecadorService:
             longitud = ubicacion.get("longitud")
             direccion = ubicacion.get("direccionCompleta", {})
 
-            #Extraemos valores de direccionCompleta
-            direccionCompleta = direccion.get("direccionCompleta", "")
+            # Validamos tenga la dirección completa
+            if direccion is not None:
+                direccionCompleta = direccion.get("direccionCompleta", {})
+            else:
+                direccionCompleta = ""
 
             #Envio de datos a SP
             checada_result = ChecadorModel.registrar_checada(usuario_id,tipo_checada,latitud,longitud,
@@ -130,19 +133,22 @@ class ChecadorService:
     def obtener_bitacora_checadas_detalle(data):
         try:
             LOG.info("## obtener_bitacora_checadas_detalle ##")
-            usuario_id = data.get("usuario_id")  
-            rango_fecha_inicio = data.get("rango_fecha_inicio")  
-            rango_fecha_fin = data.get("rango_fecha_fin")
-            id_empresa = data.get("id_empresa")
-            generar_pdf = data.get("generar_pdf")
+            usuario_id = data.get("usuario_id","")  
+            rango_fecha_inicio = data.get("rango_fecha_inicio","")  
+            rango_fecha_fin = data.get("rango_fecha_fin","")
+            id_empresa = data.get("id_empresa","")
+            generar_pdf = data.get("generar_pdf",0)
+            pagina = data.get("pagina",1)
 
             # Validamos y enviamos vacio si no viene con valores
             usuario_id = usuario_id if usuario_id else ''
             rango_fecha_inicio = rango_fecha_inicio.strip() if rango_fecha_inicio else ''
             rango_fecha_fin = rango_fecha_fin.strip() if rango_fecha_fin else ''
             id_empresa = id_empresa if id_empresa else ''
+            pagina = pagina if pagina else 1
 
-            listado_result = ChecadorModel.obtener_bitacora_checadas_detalle(usuario_id,rango_fecha_inicio,rango_fecha_fin,id_empresa)
+            listado_result = ChecadorModel.obtener_bitacora_checadas_detalle(usuario_id,rango_fecha_inicio,rango_fecha_fin,
+                                                                            id_empresa,pagina)
 
             # Convertimos valores obtenidos
             columns = listado_result.keys()
@@ -157,9 +163,13 @@ class ChecadorService:
             # Obtenemos registros de fechas para formatear como 'YYYY-MM-DD HH:mm:ss'
             df_result["fecha_registro"] = pd.to_datetime(df_result["fecha_registro"])
             df_result["fecha_captura_dispositivo"] = pd.to_datetime(df_result["fecha_captura_dispositivo"])
+            df_result["fecha_jornada"] = pd.to_datetime(df_result["fecha_jornada"])
+
             # Formateo fechas
             df_result["fecha_registro"] = df_result["fecha_registro"].dt.strftime("%Y-%m-%d %H:%M:%S")
             df_result["fecha_captura_dispositivo"] = df_result["fecha_captura_dispositivo"].dt.strftime("%Y-%m-%d %H:%M:%S")
+
+            df_result["fecha_jornada"] = df_result["fecha_jornada"].dt.strftime("%Y-%m-%d")
             # Obtener registros como diccionario
             registros = df_result.to_dict(orient="records")
 
@@ -222,6 +232,9 @@ class ChecadorService:
             id_usuario = registro.get("id_usuario")
             id_empresa = registro.get("id_empresa")
             nombre_empresa = registro.get("nombre_empresa")
+            fecha_jornada = registro.get("fecha_jornada")
+            pagina = registro.get("pagina")
+
             
             if id_usuario not in usuarios_dict:
                 usuarios_dict[id_usuario] = {
@@ -229,6 +242,7 @@ class ChecadorService:
                     "nombre_completo": str(registro.get("nombre_completo", "")).strip(),
                     "id_empresa": id_empresa,
                     "nombre_empresa": nombre_empresa,
+                    "pagina:":pagina,
                     "detalle_checadas": []
                 }
             
@@ -240,8 +254,11 @@ class ChecadorService:
                 "coordenadas_latitud": registro.get("coordenadas_latitud"),
                 "coordenadas_longitud": registro.get("coordenadas_longitud"),
                 "direccion_ubicacion": registro.get("direccion_ubicacion"),
+                "fecha_jornada": registro.get("fecha_jornada"),
                 "fecha_registro": registro.get("fecha_registro"),
-                "fecha_captura_dispositivo": registro.get("fecha_captura_dispositivo")
+                "fecha_captura_dispositivo": registro.get("fecha_captura_dispositivo"),
+                "checada_UUID": registro.get("checada_UUID"),
+                "num_registro": registro.get("num_registro")
             }
             
             usuarios_dict[id_usuario]["detalle_checadas"].append(detalle)
@@ -253,8 +270,8 @@ class ChecadorService:
                 key=lambda x: str(x.get("fecha_registro", ""))
             )
         
-        # Convertir a lista y ordenar por nombre
+        # Convertir a lista y ordenar por num empleado
         usuarios_lista = list(usuarios_dict.values())
-        usuarios_lista.sort(key=lambda x: x.get("nombre_completo", ""))
+        usuarios_lista.sort(key=lambda x: x.get("id_usuario", ""))
         
         return usuarios_lista

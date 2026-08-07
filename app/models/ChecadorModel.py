@@ -36,9 +36,9 @@ class ChecadorModel(sql_connection.Model):
         return result
     
     @staticmethod
-    def obtener_bitacora_checadas_detalle(usuario_id,rango_fecha_inicio,rango_fecha_fin,id_empresa):
+    def obtener_bitacora_checadas_detalle(usuario_id,rango_fecha_inicio,rango_fecha_fin,id_empresa,pagina):
         sql = text(f"EXEC sp_BitacoraChecadasDetalle @UsuarioSistema='{usuario_id}',@RangoFechaInicio='{rango_fecha_inicio}'"
-                f",@RangoFechaFin='{rango_fecha_fin}', @IdEmpresa='{id_empresa}';")
+                f",@RangoFechaFin='{rango_fecha_fin}', @IdEmpresa='{id_empresa}',@Pagina={pagina} ;")
         LOG.info(f"## Consulta: {sql}")
         result = sql_connection.session.execute(sql)
         

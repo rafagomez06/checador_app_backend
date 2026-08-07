@@ -27,3 +27,9 @@ def registrar_usuario():
 def actualizar_password():
     data = request.get_json()
     return UsuariosService.actualizar_password(data)
+
+@UsuariosController.route("/actualizar-permiso-app", methods=["PUT"])
+def actualizar_permiso_app():
+    data = request.get_json()
+    return UsuariosService.actualizar_permiso_app(data)
+

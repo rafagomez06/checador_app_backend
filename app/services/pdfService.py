@@ -15,7 +15,7 @@ class PDFService:
     
     @staticmethod
     def generar_pdf_checadas(datos, titulo="Reporte de Checadas App",rango_fecha_inicio='1900-01-01',
-                            rango_fecha_fin='1900-01-01',id_empresa='0'):
+                            rango_fecha_fin='1900-01-01',id_empresa='0',pagina='1'):
         """
         Genera un PDF con la información de checadas.
         """

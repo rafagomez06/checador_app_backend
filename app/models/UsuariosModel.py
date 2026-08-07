@@ -41,6 +41,14 @@ class UsuariosModel(sql_connection.Model):
 
         result = sql_connection.session.execute(sql)
         return result
+
+    @staticmethod
+    def actualizar_permiso_app(usuario,flag_permiso):
+        sql = text(f"EXEC sp_ActualizarPermisoAPP @UsuarioChecador='{usuario}',@FlagPermiso={flag_permiso};")
+        LOG.info(f"## Consulta: {sql}")
+
+        result = sql_connection.session.execute(sql)
+        return result
     
     @staticmethod
     def obtener_usuario_login(usuario):

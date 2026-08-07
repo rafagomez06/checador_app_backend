@@ -120,8 +120,12 @@ class UsuariosService:
             nombre_usuarioSQL = primer_elemento_sql.get('nombre_usuario')
             correo_usuarioSQL = primer_elemento_sql.get('correo')
             id_empleadoSQL = primer_elemento_sql.get('id_empleado')
+
+            #Obtenemos datos jornada
             dia_semanaSQL = primer_elemento_sql.get('dia_semana')
             clave_turnoSQL = primer_elemento_sql.get('clave_turno')
+            festivoSQL = primer_elemento_sql.get("festivo")
+            es_laboralSQL = primer_elemento_sql.get("es_laboral")
             hora_inicioSQL = primer_elemento_sql.get('hora_inicio')
             hora_finSQL = primer_elemento_sql.get('hora_fin')
 
@@ -147,6 +151,8 @@ class UsuariosService:
                     "jornada":{
                             "dia_semana": dia_semanaSQL,
                             "clave_turno": clave_turnoSQL,
+                            "festivo": festivoSQL,
+                            "es_laboral": es_laboralSQL,
                             "hora_inicio": hora_inicioSQL,
                             "hora_fin": hora_finSQL,
                         }
@@ -262,8 +268,61 @@ class UsuariosService:
             raise DatabaseError("Error al consultar la base de datos - actualizar_password")
         except ValueError as e: 
             LOG.warning(f"Parámetro inválido: {str(e)}")
-            raise UnexpectedError("Parámetros de búsqueda inválidos")
+            raise UnexpectedError("Parámetros de búsqueda inválidos - actualizar_password")
         except Exception as e:  
             error_trace = traceback.format_exc()
             LOG.error(f"Error inesperado: {str(e)} | Trace: {error_trace}")
             raise UnexpectedError("Ocurrió un error inesperado - actualizar_password")   
+
+
+    # Actualizar Permiso a uso de la app
+    @staticmethod
+    def actualizar_permiso_app(data):
+        try:
+            LOG.info("## actualizar_permiso_app ##")
+            # Obtenemos valores 
+            usuario = data["usuario"].strip()
+            flag_permiso = data["flag_permiso"]
+
+
+
+            #Envio de datos
+            actualizar_permiso_result = UsuariosModel.actualizar_permiso_app(usuario,flag_permiso)
+
+            # Convertimos valores obtenidos
+            columns = actualizar_permiso_result.keys()
+            rows = actualizar_permiso_result.fetchall()
+            df_result = pd.DataFrame(rows, columns=columns)
+            json_result = df_result.to_json(orient="records")
+            
+            # Procesar el resultado del SP
+            json_data = json.loads(json_result)
+            primer_elemento_sql = json_data[0]
+            estadoSQL = primer_elemento_sql.get('estatus')
+            mensajeSQL = primer_elemento_sql.get('mensaje')
+
+            # si SP falla se retorna su respuesta
+            if estadoSQL != STATUS_CODE_200:
+                LOG.info(f"Error: {mensajeSQL} ")
+                # ConnectionDb.alchemy_db.session.rollback()
+                return api_response(STATUS_CODE_400,{},ERROR,mensajeSQL)
+            
+            #Commit y Retorno de datos
+            ConnectionDb.alchemy_db.session.commit()
+            return api_response(STATUS_CODE_200,json_data,SUCCESS,mensajeSQL)        
+
+        except exc.StatementError as sta_err:
+            error_trace = traceback.format_exc()
+            LOG.error(
+                f"Err al realizar la sentencia en actualizar_permiso_app:{str(sta_err)} [{error_trace}]")
+            raise DatabaseError("Err al realizar la sentencia SQL")
+        except exc.SQLAlchemyError as e: 
+            LOG.error(f"DB error en actualizar_permiso_app: {str(e)}")
+            raise DatabaseError("Error al consultar la base de datos - actualizar_permiso_app")
+        except ValueError as e: 
+            LOG.warning(f"Parámetro inválido: {str(e)}")
+            raise UnexpectedError("Parámetros de búsqueda inválidos - actualizar_permiso_app")
+        except Exception as e:  
+            error_trace = traceback.format_exc()
+            LOG.error(f"Error inesperado: {str(e)} | Trace: {error_trace}")
+            raise UnexpectedError("Ocurrió un error inesperado - actualizar_permiso_app")           
